@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "605793685821",
+    "firebase_url": "https://tamal-app.firebaseio.com",
+    "project_id": "tamal-app",
+    "storage_bucket": "tamal-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605793685821:android:d618712a27ea3d13f9f554",
+        "android_client_info": {
+          "package_name": "com.example.ux"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "605793685821-1ih8mhg60j72j96bbtg306o4f5u0g5op.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ux",
+            "certificate_hash": "3b5a1c1ee31e2f483fdadf367d4b13b8acaa78ca"
+          }
+        },
+        {
+          "client_id": "605793685821-0obfbar74qc0k71k2a0tmld1bcnvj9tt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjOYQ27qyk1tW9dycTQ7qylnbUFglWbyA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "605793685821-0obfbar74qc0k71k2a0tmld1bcnvj9tt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "605793685821-e27sdjbkihhftugdq8kbbr9plfkq2hld.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tamalapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
