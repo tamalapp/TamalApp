@@ -32,9 +32,12 @@ dependencies:
   country_list_pick: ^1.0.0+2
   firebase_auth: ^0.15.5+3
   shared_preferences: ^0.5.6+3
-  flutter_map: ^0.8.2
+  google_maps_flutter: ^0.5.25+2
   flutter_svg: ^0.17.3+1
-  geolocation: ^1.1.2
+  geolocator: ^5.3.0
+  permission_handler: ^4.4.0+hotfix.2
+  fluttertoast: ^4.0.1
+  provider: ^2.0.1
 
 
 dev_dependencies:
@@ -56,6 +59,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
    - assets/
+   - assets/style/ligth.json
+   - assets/style/dark.json
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
