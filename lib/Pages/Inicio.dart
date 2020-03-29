@@ -1,140 +1,183 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:ui'as ui;
+import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:geolocation/geolocation.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ux/provider/CambiarColor.dart';
 
-class InicioPage extends StatefulWidget {
+class InicioMaps extends StatefulWidget {
   @override
-  _InicioPageState createState() => _InicioPageState();
+  _InicioMapsState createState() => _InicioMapsState();
 }
 
-class _InicioPageState extends State<InicioPage> {
+class _InicioMapsState extends State<InicioMaps> {
 
-  MapController controller = MapController();
 
-  getPermission() async {
+  GoogleMapController _mapController;
 
-    final GeolocationResult result = await Geolocation.requestLocationPermission(
-      permission: const LocationPermission(
-        android: LocationPermissionAndroid.fine,
-        ios: LocationPermissionIOS.always));
-    return result;
+  bool isMapCreated = true;
+
+  Uint8List marcador;
+
+  Marker miMarcador;
+
+  
+  
+
+  
+
+  StreamSubscription<Position> _positionStream;
+  Map<MarkerId, Marker> _markers = Map();
+
+  _localizacion() {
+    final geolocator = Geolocator();
+    final locationOptions =
+        LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 5 );
+
+    _positionStream = geolocator
+        .getPositionStream(locationOptions)
+        .listen(_updateLocalization);
   }
 
-  getLocation(){
-    return getPermission().then((result) async{
-
-      if(result.isSuccessful) {
-        final coord = await Geolocation.currentLocation(accuracy: LocationAccuracy.best);
+  _updateLocalization(Position position){
+    if(position != null ){
+        final miPosicion = LatLng(position.latitude, position.longitude);
+        
+        
+      if(miMarcador == null){
+        final markerId = MarkerId('YO');
+        final bitmap = BitmapDescriptor.fromBytes(marcador);
+        miMarcador = Marker(
+          markerId: markerId,
+          position: miPosicion,
+          icon: bitmap,
+          anchor: Offset(0.5, 1)
+        );
+      }else {
+        miMarcador = miMarcador.copyWith(positionParam: miPosicion);
       }
-
-    });
+      setState(() {
+        _markers[miMarcador.markerId]= miMarcador;
+      });
+         _mover(position);
+       }
   }
 
-  buildMap(){
-    getLocation().then((response){
-      if(response.isSuccessful){
-
-        response.listen((value){
-          controller.move(LatLng(value.location.latitude, value.location.longitude), 15.0);
-        });
-      }
-    });
+  _mover(Position position){
+    final cameraUpdate = CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude));
+    _mapController.animateCamera(cameraUpdate);
   }
 
-  String tipoMapa = 'light';
+  @override
+  void initState() { 
+    _loadMarker(); 
+    isMapCreated = true;
+    super.initState();
+    
+  }
 
-  Color color = Colors.black;
+  @override
+  void dispose() { 
+    if(_positionStream!=null){
+      _positionStream.cancel();
+      _positionStream = null;
+    }
+    super.dispose();
+  }
+
+  _loadMarker() async{
+      final byteData = await rootBundle.load('assets/marker.png');
+      marcador = byteData.buffer.asUint8List();
+      final code = await ui.instantiateImageCodec(marcador, targetWidth: 120);
+      final ui.FrameInfo frameInfo = await code.getNextFrame();
+     marcador = ( await frameInfo.image.toByteData(format: ui.ImageByteFormat.png)).buffer.asUint8List();
+      _localizacion();
+  }
+  Future<String> getJsonFile(String path) async {
+    return await rootBundle.loadString(path);
+  }
+  void setMapStyle(String mapStyle) {
+    _mapController.setMapStyle(mapStyle);
+  }
+
+  static final CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(2.947454, -75.298967),
+    zoom: 15,
+  );
   @override
   Widget build(BuildContext context) {
-    String accessToken =
-        'pk.eyJ1IjoiYWxlamFuZHJvciIsImEiOiJjazNnZzUyNGwwMWlxM2RxZ3k0NWxtZWtqIn0._--Y1WfYW9LuiLJp2c5T-g';
-    return Stack(
-      children: <Widget>[
-        FlutterMap(
-          options: MapOptions(
-            center: LatLng(2.948459, -75.297904), minZoom: 5.0,
-            zoom: 15.0,
-          ),
-          layers: [
-            TileLayerOptions(
-              urlTemplate: "https://api.tiles.mapbox.com/v4/"
-                  "{id}/{z}/{x}/{y}@2x.png?access_token=$accessToken",
-              additionalOptions: {
-                'accessToken': accessToken,
-                'id': 'mapbox.$tipoMapa',
-              },
-            ),
-            MarkerLayerOptions(
-              markers: [
-                Marker(
-                  width: 80.0,
-                  height: 80.0,
-                  point: LatLng(2.947293, -75.302145),
-                  builder: (ctx) => Container(
-                    child: SvgPicture.asset('assets/pin.svg',),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: InkWell(
-                      child: Container(
-                        height: 50,
-                        width: 50,
-                        child: Icon(
-                          Icons.map,
-                          color: color,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: color)
-                        ),
-                      ),
-                      onTap: () {
-                        if (tipoMapa == 'streets') {
-                          tipoMapa = 'dark';
-                          color = Colors.white;
-                        } else if (tipoMapa == 'dark') {
-                          tipoMapa = 'light';
-                          color = Colors.black;
-                        } else if (tipoMapa == 'light') {
-                          tipoMapa = 'outdoors';
-                          color = Colors.black;
-                        } else if (tipoMapa == 'outdoors') {
-                          tipoMapa = 'satellite';
-                          color = Colors.black;
-                        } else {
-                          tipoMapa = 'streets';
-                          color = Colors.black;
-                        }
 
-                        setState(() {});
-                      },
-                    ),
-                  )
-                ],
-              )
+     final mapaEstilo = Provider.of<ThemeState>(context);
+
+    if (isMapCreated) {
+      if(mapaEstilo.isDarkModeEnable){
+       getJsonFile("assets/style/dark.json").then(setMapStyle);
+    }else{
+       getJsonFile("assets/style/ligth.json").then(setMapStyle);
+    }
+    }
+
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: Stack(
+            children: <Widget>[
+              GoogleMap(
+      initialCameraPosition: _kGooglePlex,
+      myLocationButtonEnabled: true,
+      myLocationEnabled: true,
+      markers: Set.of(_markers.values),
+      onTap: _onTap,
+      onMapCreated: (GoogleMapController controller) {
+        _mapController = controller;
+        isMapCreated = true;
+        
+      },
+    )
             ],
           ),
         ),
-      ],
+      ),
     );
+
+    
+   
   }
+
+  _onMarkerTap(String id){
+
+    showDialog(context: context, builder: (BuildContext context){
+
+      return CupertinoAlertDialog(
+        title: Text('Click'),
+        content: Text('Marcador id $id'),
+        actions: <Widget>[
+          CupertinoDialogAction(
+            child: Text('ACEPTAR', style: TextStyle(letterSpacing: 0.5), ),
+            onPressed: ()=> Navigator.pop(context),
+            )
+        ],
+      );
+    });
+  }
+
+  _onTap(LatLng p){
+    final id = '${_markers.length}';
+    final markerId = MarkerId(id);
+    final infoWindows = InfoWindow(title:'Marcador ${id}', snippet: '${p.latitude},${p.longitude}' );
+    final marker = Marker(markerId: markerId, position: p, infoWindow: infoWindows, onTap: ()=>_onMarkerTap(id));
+    setState(() {
+      _markers[markerId] = marker;
+    });
+  }
+
+  
 }

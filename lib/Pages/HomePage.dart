@@ -17,11 +17,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>{
   int currentIndex;
 
+  final ThemeData hola = ThemeData.light();
+
   List<int> _renderedTabs = [0];
 
 
   List<Widget> _tabList = [
-    InicioPage(),
+    InicioMaps(),
     Container(
         child: Center(
       child: Text('text2'),
@@ -34,6 +36,7 @@ class _HomePageState extends State<HomePage>{
   ];
 
   Future<void> _fotoDialog(BuildContext context) {
+    
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -104,12 +107,13 @@ class _HomePageState extends State<HomePage>{
               elevation: 10,
               onPressed: () => _sheetDialog(),
               child: Icon(Icons.add),
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).accentColor,
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: BubbleBottomBar(
         opacity: .2,
+        backgroundColor: Theme.of(context).primaryColor,
         currentIndex: currentIndex,
         onTap: (int newCurrentPage) {
           
@@ -125,35 +129,36 @@ class _HomePageState extends State<HomePage>{
         fabLocation: currentIndex == 0 ? BubbleBottomBarFabLocation.end : null,
         hasNotch: true,
         hasInk: true,
+        
         inkColor: Colors.black12,
         items: <BubbleBottomBarItem>[
           BubbleBottomBarItem(
               backgroundColor: Colors.red,
               icon: Icon(
                 Icons.home,
-                color: Colors.black,
+                color: IconTheme.of(context).color
               ),
               activeIcon: Icon(
                 Icons.home,
                 color: Colors.red,
               ),
-              title: Text("Inicio")),
+              title: Text("Inicio", style: TextStyle(color: hola== ThemeData.dark()? Colors.white: Colors.red ),)),
           BubbleBottomBarItem(
               backgroundColor: Colors.deepPurple,
               icon: Icon(
                 Icons.notifications,
-                color: Colors.black,
+                color: IconTheme.of(context).color
               ),
               activeIcon: Icon(
                 Icons.notifications_active,
-                color: Colors.deepPurple,
+                color: Colors.deepPurple
               ),
               title: Text("Notificación")),
           BubbleBottomBarItem(
               backgroundColor: Colors.indigo,
               icon: Icon(
                 Icons.add_shopping_cart,
-                color: Colors.black,
+                color: IconTheme.of(context).color
               ),
               activeIcon: Icon(
                 Icons.add_shopping_cart,
@@ -164,7 +169,7 @@ class _HomePageState extends State<HomePage>{
               backgroundColor: Colors.green,
               icon: Icon(
                 Icons.settings,
-                color: Colors.black,
+                color: IconTheme.of(context).color
               ),
               activeIcon: Icon(
                 Icons.settings,
@@ -196,6 +201,7 @@ class _HomePageState extends State<HomePage>{
       // ),
     );
   }
+  
 
   void _sheetDialog() {
     showModalBottomSheet(
