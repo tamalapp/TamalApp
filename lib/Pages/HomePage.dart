@@ -1,42 +1,34 @@
-
-
 import 'dart:io';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:bubble_bottom_bar/bubble_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ux/Pages/Configuracion.dart';
 import 'package:ux/Pages/Inicio.dart';
-
-import 'AjustesPage.dart';
+import 'package:ux/bloc/drawer_event.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>{
+class _HomePageState extends State<HomePage> {
   int currentIndex;
 
   final ThemeData hola = ThemeData.light();
 
   List<int> _renderedTabs = [0];
 
-
   List<Widget> _tabList = [
     InicioMaps(),
-    Container(
-        child: Center(
-      child: Text('text2'),
-    )),
-    Container(
-        child: Center(
-      child: Text('text3'),
-    )),
-    AjustesPage()
+    BlocProvider<DrawerBloc>(
+      create: (context) => DrawerBloc(),
+      child: ConfigPage(),
+    )
   ];
 
   Future<void> _fotoDialog(BuildContext context) {
-    
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -56,9 +48,7 @@ class _HomePageState extends State<HomePage>{
                       Icons.camera,
                       color: Theme.of(context).primaryColor,
                     ),
-                    onTap: () {
-                      _abrirGaleria(context);
-                    },
+                    onTap: () {},
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -68,9 +58,7 @@ class _HomePageState extends State<HomePage>{
                         Icons.camera_alt,
                         color: Theme.of(context).primaryColor,
                       ),
-                      onTap: () {
-                        _tomarFoto(context);
-                      },
+                      onTap: () {},
                     ),
                   ),
                 ],
@@ -81,7 +69,6 @@ class _HomePageState extends State<HomePage>{
   }
 
   File foto;
-
 
   @override
   void dispose() {
@@ -107,21 +94,19 @@ class _HomePageState extends State<HomePage>{
               elevation: 10,
               onPressed: () => _sheetDialog(),
               child: Icon(Icons.add),
-              backgroundColor: Theme.of(context).accentColor,
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: BubbleBottomBar(
         opacity: .2,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).canvasColor,
         currentIndex: currentIndex,
         onTap: (int newCurrentPage) {
-          
           setState(() {
             currentIndex = newCurrentPage;
-            if(!_renderedTabs.contains(newCurrentPage)){
-            _renderedTabs.add(newCurrentPage);
-          }
+            if (!_renderedTabs.contains(newCurrentPage)) {
+              _renderedTabs.add(newCurrentPage);
+            }
           });
         },
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -129,62 +114,55 @@ class _HomePageState extends State<HomePage>{
         fabLocation: currentIndex == 0 ? BubbleBottomBarFabLocation.end : null,
         hasNotch: true,
         hasInk: true,
-        
         inkColor: Colors.black12,
         items: <BubbleBottomBarItem>[
           BubbleBottomBarItem(
               backgroundColor: Colors.red,
-              icon: Icon(
-                Icons.home,
-                color: IconTheme.of(context).color
+              icon: JelloIn(
+                  duration: Duration(seconds: 1),
+                  child: Icon(Icons.home, color: IconTheme.of(context).color)),
+              activeIcon: SlideInLeft(
+                from: 30,
+                duration: Duration(seconds: 1),
+                child: Icon(
+                  Icons.home,
+                  color: Colors.red,
+                ),
               ),
-              activeIcon: Icon(
-                Icons.home,
-                color: Colors.red,
-              ),
-              title: Text("Inicio", style: TextStyle(color: hola== ThemeData.dark()? Colors.white: Colors.red ),)),
-          BubbleBottomBarItem(
-              backgroundColor: Colors.deepPurple,
-              icon: Icon(
-                Icons.notifications,
-                color: IconTheme.of(context).color
-              ),
-              activeIcon: Icon(
-                Icons.notifications_active,
-                color: Colors.deepPurple
-              ),
-              title: Text("Notificación")),
-          BubbleBottomBarItem(
-              backgroundColor: Colors.indigo,
-              icon: Icon(
-                Icons.add_shopping_cart,
-                color: IconTheme.of(context).color
-              ),
-              activeIcon: Icon(
-                Icons.add_shopping_cart,
-                color: Colors.indigo,
-              ),
-              title: Text("Vender")),
+              title: SlideInRight(
+                delay: Duration(milliseconds: 1500),
+                child: Text(
+                  "Inicio",
+                  style: TextStyle(
+                      color:
+                          hola == ThemeData.dark() ? Colors.white : Colors.red),
+                ),
+              )),
           BubbleBottomBarItem(
               backgroundColor: Colors.green,
-              icon: Icon(
-                Icons.settings,
-                color: IconTheme.of(context).color
+              icon: JelloIn(
+                  duration: Duration(seconds: 1),
+                  child:
+                      Icon(Icons.settings, color: IconTheme.of(context).color)),
+              activeIcon: SlideInLeft(
+                from: 30,
+                duration: Duration(seconds: 1),
+                child: Icon(
+                  Icons.settings,
+                  color: Colors.green,
+                ),
               ),
-              activeIcon: Icon(
-                Icons.settings,
-                color: Colors.green,
-              ),
-              title: Text("Ajustes"))
+              title: SlideInRight(
+                  delay: Duration(milliseconds: 1500), child: Text("Ajustes")))
         ],
       ),
-       body: IndexedStack(
-           children: List.generate(_tabList.length, (index){
-              return _renderedTabs.contains(index)?_tabList[index]:Container();
-           }),
-           index: currentIndex,
-         ),
-       
+      body: IndexedStack(
+        children: List.generate(_tabList.length, (index) {
+          return _renderedTabs.contains(index) ? _tabList[index] : Container();
+        }),
+        index: currentIndex,
+      ),
+
       //PageView.builder(
       //   controller: _pageController,
       //   onPageChanged: (int newPage) {
@@ -201,7 +179,6 @@ class _HomePageState extends State<HomePage>{
       // ),
     );
   }
-  
 
   void _sheetDialog() {
     showModalBottomSheet(
@@ -231,29 +208,30 @@ class _HomePageState extends State<HomePage>{
                   child: ListView(
                     children: <Widget>[
                       Column(
-                      children: <Widget>[
-                        
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              child: Text(
-                                'SERVICIO',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                              ),
-                            )
-                          ],
-                        ),
-                        Container(
-                          height: 1,
-                          width: double.infinity,
-                          color: Colors.grey,
-                        ),
-                        _foto(),
-                       _crearNombre()
-                      ],
-                    ),
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                child: Text(
+                                  'SERVICIO',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              )
+                            ],
+                          ),
+                          Container(
+                            height: 1,
+                            width: double.infinity,
+                            color: Colors.grey,
+                          ),
+                          _crearNombre()
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -261,49 +239,7 @@ class _HomePageState extends State<HomePage>{
         });
   }
 
-  
-
-  Widget _foto() {
-    return InkWell(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15.0),
-          child: Image(
-            image: AssetImage(foto?.path ?? 'assets/image.png'),
-            height: 250.0,
-            fit: BoxFit.cover,
-          ),
-        ),
-        onTap: () {
-          _fotoDialog(context);
-        });
-  }
-
-  _abrirGaleria(BuildContext context) {
-    _procesarImagen(ImageSource.gallery);
-    Navigator.of(context).pop();
-  }
-
-  _tomarFoto(BuildContext context) {
-    _procesarImagen(ImageSource.camera);
-    Navigator.of(context).pop();
-  }
-
-  _procesarImagen(ImageSource origen) async {
-    foto = await ImagePicker.pickImage(source: origen);
-    print(foto.path);
-    if (foto != null) {
-      ClipRRect(
-        borderRadius: BorderRadius.circular(15.0),
-        child: Image(
-            image: AssetImage(foto?.path ?? 'assets/image.png'),
-            height: 250.0,
-            fit: BoxFit.cover),
-      );
-    }
-    setState(() {});
-  }
-
- Widget _crearNombre() {
+  Widget _crearNombre() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: TextField(

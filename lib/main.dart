@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:ux/Pages/Inicio.dart';
-import 'package:ux/Pages/Login.dart';
-import 'package:ux/Pages/Perfil.dart';
 import 'package:ux/Pages/splash.dart';
 import 'package:ux/provider/CambiarColor.dart';
+import 'package:ux/provider/DireccionProvider.dart';
 
 import 'Pages/HomePage.dart';
  
-void main() => runApp(MyApp());
+void main() {
+runApp(MyApp());
+   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  
+} 
  
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    
     return  MultiProvider(
       providers: [
+        ChangeNotifierProvider<DireccionProvider>(
+          create: (_)=> DireccionProvider(),
+        ),
         ChangeNotifierProvider<ThemeState>(
-          builder: (_)=> ThemeState(),
+          create: (_)=> ThemeState(),
         )
 
       ],
@@ -25,14 +33,12 @@ class MyApp extends StatelessWidget {
             return MaterialApp(
           
             debugShowCheckedModeBanner: false,
-            title: 'Diseño',
+            title: 'TamalApp',
             home: Splash(),
             theme: state.currentTheme,
             
             routes: {
-              // 'home' : (BuildContext context)=> HomePage(),
-              'login' : (BuildContext context)=> LoginPage(),
-              'perfil' : (BuildContext context)=> Perfil(),
+              // 'login' : (BuildContext context)=> LoginPage(),
               'maps'  : (BuildContext context)=> InicioMaps(),
               'home' : (BuildContext context) => HomePage()
             },

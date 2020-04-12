@@ -11,8 +11,9 @@ class ThemeState with ChangeNotifier{
     iconTheme: IconThemeData(
       color: Colors.white
     ),
+    
+    
     toggleableActiveColor: Colors.redAccent,
-    accentColor: Colors.red,
     textTheme: TextTheme(
       display1: TextStyle(color: Colors.red)
     ),
@@ -20,11 +21,18 @@ class ThemeState with ChangeNotifier{
       buttonColor: Colors.red
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Colors.red
-    )
-  ): ThemeData.light().copyWith(
-    primaryColor: Colors.white,
+      foregroundColor: Colors.white
+    ),
+    accentColor: Colors.white
     
+  ): ThemeData.light().copyWith(
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: Colors.green,
+      foregroundColor: Colors.white
+    ),
+    accentColor: Colors.green,
+    primaryColor: Colors.green,
+    backgroundColor: Colors.green,
   );
 
   bool get isDarkModeEnable => _isDarkModeEnable;

@@ -52,7 +52,7 @@ class _SplashState extends State<Splash>  with WidgetsBindingObserver{
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    // 
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
